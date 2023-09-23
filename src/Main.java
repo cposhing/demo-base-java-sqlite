@@ -7,10 +7,42 @@ public class Main {
 
         // demoInsert();
         // demoSelect();
-
-        demoDelete();
+        // demoDelete();
+        demoUpdate();
     }
 
+
+    private static void demoUpdate() {
+        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:demo.db")) {
+            // get a customer by id ;
+            String selectByIdSql = "select id, name from customers where id = ?;";
+            PreparedStatement preparedStatement = connection.prepareStatement(selectByIdSql);
+            preparedStatement.setInt(1, 1);
+
+            // check the exists customer
+            ResultSet resultSet = preparedStatement.executeQuery();
+            int fetchSize = resultSet.getFetchSize();
+            System.out.println("fetchSize = " + fetchSize);
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String name = resultSet.getString("name");
+                System.out.println("customer id = 1 is [" + id + "-" + name + "]");
+            }
+
+            // update
+            String updateSql = "update customers set name = ? where id = ?";
+            PreparedStatement updatePreparedStatement = connection.prepareStatement(updateSql);
+            updatePreparedStatement.setString(1, "poshing1");
+            updatePreparedStatement.setInt(2, 1);
+            int i = updatePreparedStatement.executeUpdate();
+            System.out.println("updated data count is " + i);
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @SuppressWarnings("unused")
     private static void demoDelete() {
         try (Connection connection = DriverManager.getConnection("jdbc:sqlite:demo.db")) {
             String deleteSql = "delete from customers where id = ?";
